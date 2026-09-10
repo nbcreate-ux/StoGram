@@ -85,7 +85,9 @@ jobs:
               "ExpirationDate": datetime(2099, 1, 1),
               "Entitlements": {
                   "application-identifier": "C67CF9S4VU.ua.nbcreate.stogram",
+                  "com.apple.security.application-groups": ["group.ua.nbcreate.stogram"],
                   "com.apple.developer.team-identifier": "C67CF9S4VU",
+                  "com.apple.developer.carplay-messaging": True,
                   "get-task-allow": True,
                   "keychain-access-groups": ["C67CF9S4VU.*"],
                   "aps-environment": "development"
