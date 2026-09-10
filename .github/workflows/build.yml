@@ -53,6 +53,42 @@ jobs:
           test -n "$STOGRAM_API_HASH"
 
           python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs
+
+          python3 - build-system/fake-codesigning/profiles/Telegram.mobileprovision <<'PY'
+          import plistlib
+          import sys
+          import uuid
+          from datetime import datetime
+
+          plist_path = "/tmp/stogram-profile.plist"
+
+          profile = {
+              "AppIDName": "StoGram",
+              "ApplicationIdentifierPrefix": ["C67CF9S4VU"],
+              "CreationDate": datetime.now(),
+              "Platform": ["iPhoneOS"],
+              "IsXcodeManaged": False,
+              "Name": "StoGram Fake Development",
+              "TeamIdentifier": ["C67CF9S4VU"],
+              "TeamName": "StoGram",
+              "UUID": str(uuid.uuid4()).upper(),
+              "Version": 1,
+              "ExpirationDate": datetime(2099, 1, 1),
+              "Entitlements": {
+                  "application-identifier": "C67CF9S4VU.ua.nbcreate.stogram",
+                  "com.apple.developer.team-identifier": "C67CF9S4VU",
+                  "get-task-allow": True,
+                  "keychain-access-groups": ["C67CF9S4VU.*"],
+                  "aps-environment": "development"
+              }
+          }
+          with open(plist_path, "wb") as output:
+              plistlib.dump(profile, output, fmt=plistlib.FMT_XML)
+          PY
+          SIGNING_IDENTITY="$(security find-identity -v temp.keychain | awk -F '"' 'NR == 1 { print $2 }')"
+          test -n "$SIGNING_IDENTITY"
+          security cms -S -N "$SIGNING_IDENTITY" -i /tmp/stogram-profile.plist -o build-system/fake-codesigning/profiles/Telegram.mobileprovision
+
           python3 - "$GITHUB_WORKSPACE/build-system/stogram-configuration.template.json" "$SOURCE_DIR/build-system/stogram-configuration.json" <<'PY'
           import json
           import os
@@ -72,7 +108,6 @@ jobs:
             --configurationPath="build-system/stogram-configuration.json" \
             --codesigningInformationPath=build-system/fake-codesigning \
             --disableExtensions \
-            --disableProvisioningProfiles \
             --configuration=release_arm64 \
             --buildNumber="$BUILD_NUMBER"
 
