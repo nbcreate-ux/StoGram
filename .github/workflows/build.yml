@@ -1,14 +1,14 @@
-name: CI
+name: StoGram IPA
 
 on:
-  # push:
-  #   branches: [ master ]
+  push:
+    branches: [ master, main ]
 
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: macos-13
+    runs-on: macos-26
 
     steps:
       - uses: actions/checkout@v2
@@ -49,11 +49,27 @@ jobs:
           echo "BUILD_NUMBER=$(echo $BUILD_NUMBER)" >> $GITHUB_ENV
           echo "APP_VERSION=$(echo $APP_VERSION)" >> $GITHUB_ENV
 
+          test -n "$STOGRAM_API_ID"
+          test -n "$STOGRAM_API_HASH"
+
           python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs
+          python3 - "$GITHUB_WORKSPACE/build-system/stogram-configuration.template.json" "$SOURCE_DIR/build-system/stogram-configuration.json" <<'PY'
+          import json
+          import os
+          import sys
+
+          with open(sys.argv[1], encoding="utf-8") as source:
+              configuration = json.load(source)
+          configuration["api_id"] = os.environ["STOGRAM_API_ID"]
+          configuration["api_hash"] = os.environ["STOGRAM_API_HASH"]
+          with open(sys.argv[2], "w", encoding="utf-8") as destination:
+              json.dump(configuration, destination, indent=2)
+          PY
+
           python3 -u build-system/Make/Make.py \
             --bazelUserRoot="$BAZEL_USER_ROOT" \
             build \
-            --configurationPath="build-system/appstore-configuration.json" \
+            --configurationPath="build-system/stogram-configuration.json" \
             --codesigningInformationPath=build-system/fake-codesigning \
             --configuration=release_arm64 \
             --buildNumber="$BUILD_NUMBER"
@@ -63,7 +79,7 @@ jobs:
           rm -rf "$OUTPUT_PATH"
           mkdir -p "$OUTPUT_PATH"
           for f in bazel-out/applebin_ios-ios_arm*-opt-ST-*/bin/Telegram/Telegram.ipa; do
-            cp "$f" $OUTPUT_PATH/
+            cp "$f" "$OUTPUT_PATH/StoGram.ipa"
           done
 
           # collect dsym
@@ -73,6 +89,10 @@ jobs:
           done
           zip -r "./$OUTPUT_PATH/Telegram.DSYMs.zip" build/DSYMs 1>/dev/null
 
+        env:
+          STOGRAM_API_ID: ${{ secrets.STOGRAM_API_ID }}
+          STOGRAM_API_HASH: ${{ secrets.STOGRAM_API_HASH }}
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -80,9 +100,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: build-${{ env.BUILD_NUMBER }}
-          release_name: Telegram ${{ env.APP_VERSION }} (${{ env.BUILD_NUMBER }})
+          release_name: StoGram ${{ env.APP_VERSION }} (${{ env.BUILD_NUMBER }})
           body: |
-            An unsigned build of Telegram for iOS ${{ env.APP_VERSION }} (${{ env.BUILD_NUMBER }})
+            An unsigned StoGram build for iOS ${{ env.APP_VERSION }} (${{ env.BUILD_NUMBER }})
           draft: false
           prerelease: false
 
@@ -93,8 +113,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /Users/Shared/telegram-ios/build/artifacts/Telegram.ipa
-          asset_name: Telegram.ipa
+          asset_path: /Users/Shared/telegram-ios/build/artifacts/StoGram.ipa
+          asset_name: StoGram.ipa
           asset_content_type: application/zip
 
       - name: Upload Release DSYM

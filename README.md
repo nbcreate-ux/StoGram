@@ -60,7 +60,7 @@ python3 build-system/Make/Make.py \
 
 ## Xcode
 
-1. Copy and edit `build-system/appstore-configuration.json`.
+1. Copy and edit `build-system/stogram-configuration.template.json`. Set `api_id` and `api_hash` locally, or inject them from CI secrets.
 2. Copy `build-system/fake-codesigning`. Create and download provisioning profiles, using the `profiles` folder as a reference for the entitlements.
 3. Generate an Xcode project:
 ```

@@ -4,6 +4,8 @@ import TelegramApi
 import SwiftSignalKit
 
 func _internal_markMessageContentAsConsumedInteractively(postbox: Postbox, messageId: MessageId) -> Signal<Void, NoError> {
+    return .complete()
+
     return postbox.transaction { transaction -> Void in
         if let message = transaction.getMessage(messageId), message.flags.contains(.Incoming) {
             var updateMessage = false
@@ -174,6 +176,8 @@ func _internal_markReactionsOrPollVotesAsSeenInteractively(postbox: Postbox, mes
 }
 
 func markMessageContentAsConsumedRemotely(transaction: Transaction, messageId: MessageId, consumeDate: Int32?) {
+    return
+
     if let message = transaction.getMessage(messageId) {
         var updateMessage = false
         var updatedAttributes = message.attributes
@@ -262,4 +266,3 @@ func markMessageContentAsConsumedRemotely(transaction: Transaction, messageId: M
         }
     }
 }
-

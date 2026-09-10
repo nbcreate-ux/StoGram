@@ -972,7 +972,7 @@ private func finalStateWithUpdatesAndServerTime(accountPeerId: PeerId, postbox: 
                     if previousState.pts >= pts {
                         Logger.shared.log("State", "channel \(peerId) (\((updatedState.peers[peerId] as? TelegramChannel)?.title ?? "nil")) skip old delete update")
                     } else if previousState.pts + ptsCount == pts {
-                        updatedState.deleteMessages(messages.map({ MessageId(peerId: peerId, namespace: Namespaces.Message.Cloud, id: $0) }))
+                        let _ = messages
                         updatedState.updateChannelState(peerId, pts: pts)
                     } else {
                         if !missingUpdatesFromChannels.contains(peerId) {
@@ -1062,7 +1062,7 @@ private func finalStateWithUpdatesAndServerTime(accountPeerId: PeerId, postbox: 
                 let peerId = PeerId(namespace: Namespaces.Peer.CloudChannel, id: PeerId.Id._internalFromInt64Value(channelId))
                 updatedState.updateMinAvailableMessage(MessageId(peerId: peerId, namespace: Namespaces.Message.Cloud, id: minId))
             case let .updateDeleteMessages(updateDeleteMessagesData):
-                updatedState.deleteMessagesWithGlobalIds(updateDeleteMessagesData.messages)
+                let _ = updateDeleteMessagesData
             case let .updatePinnedMessages(updatePinnedMessagesData):
                 let (flags, peer, messages) = (updatePinnedMessagesData.flags, updatePinnedMessagesData.peer, updatePinnedMessagesData.messages)
                 let peerId = peer.peerId
@@ -1196,9 +1196,7 @@ private func finalStateWithUpdatesAndServerTime(accountPeerId: PeerId, postbox: 
                     updatedState.editMessage(messageId, message: message)
                 }
             case let .updateDeleteEphemeralMessages(updateDeleteEphemeralMessagesData):
-                updatedState.deleteMessages(updateDeleteEphemeralMessagesData.ids.map { id in
-                    MessageId(peerId: updateDeleteEphemeralMessagesData.peer.peerId, namespace: Namespaces.Message.EphemeralLocal, id: id)
-                })
+                let _ = updateDeleteEphemeralMessagesData
             case let .updateServiceNotification(updateServiceNotificationData):
                 let (flags, date, type, text, media, entities) = (updateServiceNotificationData.flags, updateServiceNotificationData.inboxDate, updateServiceNotificationData.type, updateServiceNotificationData.message, updateServiceNotificationData.media, updateServiceNotificationData.entities)
                 let popup = (flags & (1 << 0)) != 0
@@ -4440,30 +4438,11 @@ func replayFinalState(
                     }
                 }
             case let .DeleteMessagesWithGlobalIds(ids):
-                var resourceIds: [MediaResourceId] = []
-                transaction.deleteMessagesWithGlobalIds(ids, forEachMedia: { media in
-                    addMessageMediaResourceIdsToRemove(media: media, resourceIds: &resourceIds)
-                })
-                if !resourceIds.isEmpty {
-                    let _ = mediaBox.removeCachedResources(Array(Set(resourceIds)), force: true).start()
-                }
-                deletedMessageIds.append(contentsOf: ids.map { .global($0) })
+                let _ = ids
             case let .DeleteMessages(ids):
-                _internal_deleteMessages(transaction: transaction, mediaBox: mediaBox, ids: ids, manualAddMessageThreadStatsDifference: { id, add, remove in
-                    addMessageThreadStatsDifference(threadKey: id, remove: remove, addedMessagePeer: nil, addedMessageId: nil, isOutgoing: false)
-                })
-                deletedMessageIds.append(contentsOf: ids.map { .messageId($0) })
+                let _ = ids
             case let .UpdateMinAvailableMessage(id):
-                if let message = transaction.getMessage(id) {
-                    updatePeerChatInclusionWithMinTimestamp(transaction: transaction, id: id.peerId, minTimestamp: message.timestamp, forceRootGroupIfNotExists: false)
-                }
-                var resourceIds: [MediaResourceId] = []
-                transaction.deleteMessagesInRange(peerId: id.peerId, namespace: id.namespace, minId: 1, maxId: id.id, forEachMedia: { media in
-                    addMessageMediaResourceIdsToRemove(media: media, resourceIds: &resourceIds)
-                })
-                if !resourceIds.isEmpty {
-                    let _ = mediaBox.removeCachedResources(Array(Set(resourceIds)), force: true).start()
-                }
+                let _ = id
             case let .UpdatePeerChatInclusion(peerId, groupId, changedGroup):
                 if shouldExcludePeerFromChatList(transaction: transaction, peerId: peerId) {
                     transaction.updatePeerChatListInclusion(peerId, inclusion: .notIncluded)

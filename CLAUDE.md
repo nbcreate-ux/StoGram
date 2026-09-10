@@ -12,7 +12,7 @@ The app is built using Bazel via the `Make.py` wrapper. There is no selective pe
 python3 build-system/Make/Make.py --overrideXcodeVersion \
  --cacheDir ~/telegram-bazel-cache \
  build \
- --configurationPath build-system/appstore-configuration.json \
+ --configurationPath build-system/stogram-configuration.json \
  --gitCodesigningRepository git@gitlab.com:peter-iakovlev/fastlanematch.git \
  --gitCodesigningType development --gitCodesigningUseCurrent --buildNumber=1 --configuration=debug_sim_arm64
 ```
@@ -25,7 +25,7 @@ The build needs `TELEGRAM_CODESIGNING_GIT_PASSWORD` in the environment. It is se
 
 ```sh
 source ~/.zshrc 2>/dev/null; python3 build-system/Make/Make.py --overrideXcodeVersion --cacheDir ~/telegram-bazel-cache \
- test --configurationPath build-system/appstore-configuration.json \
+ test --configurationPath build-system/stogram-configuration.json \
  --gitCodesigningRepository git@gitlab.com:peter-iakovlev/fastlanematch.git \
  --gitCodesigningType development --gitCodesigningUseCurrent --target //submodules/TextFormat:TextFormatTests
 ```

@@ -38,6 +38,8 @@ private final class ManagedAutoremoveMessageOperationsHelper {
 }
 
 func managedAutoremoveMessageOperations(network: Network, postbox: Postbox, isRemove: Bool) -> Signal<Void, NoError> {
+    return .complete()
+
     return Signal { _ in
         let helper = Atomic(value: ManagedAutoremoveMessageOperationsHelper())
         
@@ -198,4 +200,3 @@ func managedAutoexpireStoryOperations(network: Network, postbox: Postbox) -> Sig
         }
     }
 }
-

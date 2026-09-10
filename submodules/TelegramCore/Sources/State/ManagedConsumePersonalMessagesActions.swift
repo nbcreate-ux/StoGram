@@ -252,6 +252,8 @@ func managedReadReactionOrPollVoteActions(postbox: Postbox, network: Network, st
 }
 
 private func synchronizeConsumeMessageContents(transaction: Transaction, postbox: Postbox, network: Network, stateManager: AccountStateManager, id: MessageId) -> Signal<Void, NoError> {
+    return .complete()
+
     if id.peerId.namespace == Namespaces.Peer.CloudUser || id.peerId.namespace == Namespaces.Peer.CloudGroup {
         return network.request(Api.functions.messages.readMessageContents(id: [id.id]))
             |> map(Optional.init)
@@ -321,6 +323,8 @@ private func synchronizeConsumeMessageContents(transaction: Transaction, postbox
 }
 
 private func synchronizeReadMessageReactionsOrPollVotes(transaction: Transaction, postbox: Postbox, network: Network, stateManager: AccountStateManager, id: MessageId) -> Signal<Void, NoError> {
+    return .complete()
+
     if id.peerId.namespace == Namespaces.Peer.CloudUser || id.peerId.namespace == Namespaces.Peer.CloudGroup {
         return network.request(Api.functions.messages.readMessageContents(id: [id.id]))
         |> map(Optional.init)

@@ -1671,7 +1671,7 @@ public final class AccountStateManager {
         }
         
         func notifyAppliedIncomingReadMessages(_ ids: [MessageId]) {
-            self.appliedIncomingReadMessagesPipe.putNext(ids)
+            let _ = ids
         }
         
         public func getDelayNotificatonsUntil() -> Int32? {
@@ -2180,9 +2180,7 @@ public final class AccountStateManager {
     }
     
     func notifyAppliedIncomingReadMessages(_ ids: [MessageId]) {
-        self.impl.with { impl in
-            impl.notifyAppliedIncomingReadMessages(ids)
-        }
+        let _ = ids
     }
     
     func modifyAppUpdateInfo(_ f: @escaping (AppUpdateInfo?) -> (AppUpdateInfo?)) {

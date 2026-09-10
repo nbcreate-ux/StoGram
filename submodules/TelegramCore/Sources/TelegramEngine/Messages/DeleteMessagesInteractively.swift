@@ -151,9 +151,7 @@ func deleteMessagesInteractively(transaction: Transaction, stateManager: Account
             }
         }
     }
-    _internal_deleteMessages(transaction: transaction, mediaBox: postbox.mediaBox, ids: messageIds.map(\.messageId))
-    
-    stateManager?.notifyDeletedMessages(messageIds: messageIds.map(\.messageId))
+    // Keep the local copy while the queued operation removes the message remotely.
     
     if !uniqueIds.isEmpty && removeIfPossiblyDelivered {
         stateManager?.removePossiblyDeliveredMessages(uniqueIds: uniqueIds)

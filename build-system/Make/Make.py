@@ -828,7 +828,7 @@ def add_codesigning_common_arguments(current_parser: argparse.ArgumentParser):
         '--configurationPath',
         help='''
             Path to a json containing build configuration.
-            See build-system/appstore-configuration.json for an example.
+            See build-system/stogram-configuration.template.json for an example.
             ''',
         metavar='path'
     )
@@ -1288,7 +1288,7 @@ if __name__ == '__main__':
         required=False,
         help='''
             Path to a json containing build configuration.
-            See build-system/appstore-configuration.json for an example.
+            See build-system/stogram-configuration.template.json for an example.
             ''',
         metavar='path'
     )

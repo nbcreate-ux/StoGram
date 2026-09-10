@@ -251,13 +251,7 @@ private func pushPeerReadState(network: Network, postbox: Postbox, stateManager:
                 let (channelId, accessHash) = (inputPeerChannelData.channelId, inputPeerChannelData.accessHash)
                 switch readState {
                 case let .idBased(maxIncomingReadId, _, _, _, markedUnread):
-                    var pushSignal: Signal<Void, NoError> = network.request(Api.functions.channels.readHistory(channel: Api.InputChannel.inputChannel(.init(channelId: channelId, accessHash: accessHash)), maxId: maxIncomingReadId))
-                    |> `catch` { _ -> Signal<Api.Bool, NoError> in
-                        return .complete()
-                    }
-                    |> mapToSignal { _ -> Signal<Void, NoError> in
-                        return .complete()
-                    }
+                    var pushSignal: Signal<Void, NoError> = .complete()
                     if markedUnread {
                         pushSignal = pushSignal
                         |> then(network.request(Api.functions.messages.markDialogUnread(flags: 1 << 0, parentPeer: nil, peer: .inputDialogPeer(.init(peer: inputPeer))))
@@ -281,7 +275,7 @@ private func pushPeerReadState(network: Network, postbox: Postbox, stateManager:
             default:
                 switch readState {
                 case let .idBased(maxIncomingReadId, _, _, _, markedUnread):
-                    var pushSignal: Signal<Void, NoError> = network.request(Api.functions.messages.readHistory(peer: inputPeer, maxId: maxIncomingReadId))
+                    var pushSignal: Signal<Void, NoError> = .complete()
                     |> map(Optional.init)
                     |> `catch` { _ -> Signal<Api.messages.AffectedMessages?, NoError> in
                         return .single(nil)

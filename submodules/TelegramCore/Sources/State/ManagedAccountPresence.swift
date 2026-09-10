@@ -43,33 +43,9 @@ private final class AccountPresenceManagerImpl {
     }
     
     private func updatePresence(_ isOnline: Bool) {
-        let request: Signal<Api.Bool, MTRpcError>
-        if isOnline {
-            let timer = SignalKitTimer(timeout: 30.0, repeat: false, completion: { [weak self] in
-                guard let strongSelf = self else {
-                    return
-                }
-                strongSelf.updatePresence(true)
-            }, queue: self.queue)
-            self.onlineTimer = timer
-            timer.start()
-            request = self.network.request(Api.functions.account.updateStatus(offline: .boolFalse))
-        } else {
-            self.onlineTimer?.invalidate()
-            self.onlineTimer = nil
-            request = self.network.request(Api.functions.account.updateStatus(offline: .boolTrue))
-        }
-        self.isPerformingUpdate.set(true)
-        self.currentRequestDisposable.set((request
-        |> `catch` { _ -> Signal<Api.Bool, NoError> in
-            return .single(.boolFalse)
-        }
-        |> deliverOn(self.queue)).start(completed: { [weak self] in
-            guard let strongSelf = self else {
-                return
-            }
-            strongSelf.isPerformingUpdate.set(false)
-        }))
+        self.onlineTimer?.invalidate()
+        self.onlineTimer = nil
+        self.isPerformingUpdate.set(false)
     }
 }
 

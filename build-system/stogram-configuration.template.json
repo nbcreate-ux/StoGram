@@ -1,0 +1,15 @@
+{
+	"bundle_id": "ua.nbcreate.stogram",
+	"api_id": "__STOGRAM_API_ID__",
+	"api_hash": "__STOGRAM_API_HASH__",
+	"team_id": "",
+	"app_center_id": "0",
+	"is_internal_build": "false",
+	"is_appstore_build": "false",
+	"appstore_id": "0",
+	"app_specific_url_scheme": "stogram",
+	"premium_iap_product_id": "",
+	"enable_siri": false,
+	"enable_icloud": false,
+	"sg_config": ""
+}
