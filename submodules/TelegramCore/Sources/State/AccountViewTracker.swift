@@ -943,7 +943,9 @@ public final class AccountViewTracker {
     }
     
     public func updateSeenLiveLocationForMessageIds(messageIds: Set<MessageId>) {
-        return;
+        if ProcessInfo.processInfo.environment["STOGRAM_ENABLE_REPORTS"] == nil {
+            return
+        }
 
         self.queue.async {
             var addedMessageIds: [MessageId] = []

@@ -6,7 +6,9 @@ import MtProtoKit
 
 
 func _internal_markAllChatsAsRead(postbox: Postbox, network: Network, stateManager: AccountStateManager) -> Signal<Void, NoError> {
-    return .complete()
+    if ProcessInfo.processInfo.environment["STOGRAM_ENABLE_REPORTS"] == nil {
+        return .complete()
+    }
 
     return network.request(Api.functions.messages.getDialogUnreadMarks(flags: 0, parentPeer: nil))
     |> map(Optional.init)

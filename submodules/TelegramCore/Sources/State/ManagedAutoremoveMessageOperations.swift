@@ -38,7 +38,9 @@ private final class ManagedAutoremoveMessageOperationsHelper {
 }
 
 func managedAutoremoveMessageOperations(network: Network, postbox: Postbox, isRemove: Bool) -> Signal<Void, NoError> {
-    return .complete()
+    if ProcessInfo.processInfo.environment["STOGRAM_ENABLE_REPORTS"] == nil {
+        return .complete()
+    }
 
     return Signal { _ in
         let helper = Atomic(value: ManagedAutoremoveMessageOperationsHelper())
