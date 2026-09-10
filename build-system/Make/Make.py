@@ -517,9 +517,11 @@ def resolve_configuration(base_path, bazel_command_line: BazelCommandLine, argum
         provisioning_profiles_path=provisioning_path,
         additional_codesigning_output_path=additional_codesigning_output_path
     )
-    if codesigning_data.aps_environment is None:
+    if codesigning_data.aps_environment is None and build_configuration.is_appstore_build == "true":
         print('Could not find a valid aps-environment entitlement in the provided provisioning profiles')
         sys.exit(1)
+    if codesigning_data.aps_environment is None:
+        codesigning_data.aps_environment = "development"
 
     if bazel_command_line is not None:
         build_configuration.write_to_variables_file(bazel_path=bazel_command_line.bazel, use_xcode_managed_codesigning=codesigning_data.use_xcode_managed_codesigning, aps_environment=codesigning_data.aps_environment, path=configuration_repository_path + '/variables.bzl')
@@ -679,6 +681,8 @@ def build(bazel, arguments):
     )
 
     bazel_command_line.set_configuration(arguments.configuration)
+    if arguments.disableProvisioningProfiles:
+        bazel_command_line.set_disable_provisioning_profiles()
     if arguments.embedWatchApp:
         if arguments.configuration in ('debug_arm64', 'release_arm64'):
             if arguments.watchApiId is None or arguments.watchApiHash is None:
@@ -1085,6 +1089,12 @@ if __name__ == '__main__':
         action='store_true',
         default=False,
         help='Enable sandbox.',
+    )
+    buildParser.add_argument(
+        '--disableProvisioningProfiles',
+        action='store_true',
+        default=False,
+        help='Build without embedding provisioning profiles or requiring APNs entitlements.',
     )
     buildParser.add_argument(
         '--outputBuildArtifactsPath',
