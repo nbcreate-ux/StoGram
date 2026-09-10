@@ -11,10 +11,10 @@ jobs:
     runs-on: macos-26
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
-          fetch-depth: '0'
+          fetch-depth: '1'
 
       - name: Set active Xcode path
         run: |
@@ -28,6 +28,14 @@ jobs:
           cp -R $GITHUB_WORKSPACE /Users/Shared/
           mv /Users/Shared/$(basename $GITHUB_WORKSPACE) /Users/Shared/telegram-ios
 
+      - name: Restore Bazel disk cache
+        uses: actions/cache@v4
+        with:
+          path: /Users/Shared/bazel-disk-cache
+          key: stogram-bazel-${{ runner.os }}-${{ hashFiles('MODULE.bazel.lock', 'versions.json') }}
+          restore-keys: |
+            stogram-bazel-${{ runner.os }}-
+
       - name: Build the App
         run: |
           set -x
@@ -37,14 +45,14 @@ jobs:
 
           # use canonical bazel root
           BAZEL_USER_ROOT="/private/var/tmp/_bazel_containerhost"
+          BAZEL_CACHE_DIR="/Users/Shared/bazel-disk-cache"
 
           cd $SOURCE_DIR
 
           BUILD_NUMBER_OFFSET="$(cat build_number_offset)"
 
           export APP_VERSION=$(cat versions.json | python3 -c 'import json,sys;obj=json.load(sys.stdin);print(obj["app"]);')
-          export COMMIT_COUNT=$(git rev-list --count HEAD)
-          export COMMIT_COUNT="$(($COMMIT_COUNT+$BUILD_NUMBER_OFFSET))"
+          export COMMIT_COUNT="$(($GITHUB_RUN_NUMBER+$BUILD_NUMBER_OFFSET))"
           export BUILD_NUMBER="$COMMIT_COUNT"
           echo "BUILD_NUMBER=$(echo $BUILD_NUMBER)" >> $GITHUB_ENV
           echo "APP_VERSION=$(echo $APP_VERSION)" >> $GITHUB_ENV
@@ -106,6 +114,7 @@ jobs:
 
           python3 -u build-system/Make/Make.py \
             --bazelUserRoot="$BAZEL_USER_ROOT" \
+            --cacheDir="$BAZEL_CACHE_DIR" \
             build \
             --configurationPath="build-system/stogram-configuration.json" \
             --codesigningInformationPath=build-system/fake-codesigning \
