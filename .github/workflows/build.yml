@@ -71,6 +71,7 @@ jobs:
               "Name": "StoGram Fake Development",
               "TeamIdentifier": ["C67CF9S4VU"],
               "TeamName": "StoGram",
+              "TimeToLive": 26500,
               "UUID": str(uuid.uuid4()).upper(),
               "Version": 1,
               "ExpirationDate": datetime(2099, 1, 1),
