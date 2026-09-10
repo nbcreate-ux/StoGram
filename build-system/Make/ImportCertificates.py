@@ -41,7 +41,7 @@ def import_certificates(certificatesPath):
     for file_name in os.listdir(certificatesPath):
         file_path = certificatesPath + '/' + file_name
         if file_path.endswith('.p12') or file_path.endswith('.cer'):
-            run_executable_with_output('security', arguments=[
+            import_arguments = [
                 'import',
                 file_path,
                 '-k',
@@ -52,7 +52,14 @@ def import_certificates(certificatesPath):
                 '/usr/bin/codesign',
                 '-T',
                 '/usr/bin/security'
-            ], check_result=False)
+            ]
+            if file_path.endswith('.p12'):
+                import_arguments.extend(['-f', 'pkcs12'])
+            run_executable_with_output(
+                'security',
+                arguments=import_arguments,
+                check_result=file_path.endswith('.p12')
+            )
 
     run_executable_with_output('security', arguments=[
         'import',

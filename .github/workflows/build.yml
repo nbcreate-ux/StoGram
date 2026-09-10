@@ -85,7 +85,8 @@ jobs:
           with open(plist_path, "wb") as output:
               plistlib.dump(profile, output, fmt=plistlib.FMT_XML)
           PY
-          SIGNING_IDENTITY="$(security find-identity -v temp.keychain | awk -F '"' 'NR == 1 { print $2 }')"
+          security find-identity -v -p codesigning temp.keychain
+          SIGNING_IDENTITY="$(security find-identity -v -p codesigning temp.keychain | sed -n 's/.*"\(.*\)".*/\1/p' | head -n 1)"
           test -n "$SIGNING_IDENTITY"
           security cms -S -N "$SIGNING_IDENTITY" -i /tmp/stogram-profile.plist -o build-system/fake-codesigning/profiles/Telegram.mobileprovision
 
