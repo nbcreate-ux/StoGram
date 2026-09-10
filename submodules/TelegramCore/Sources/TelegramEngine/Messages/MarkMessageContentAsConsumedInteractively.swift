@@ -176,7 +176,7 @@ func _internal_markReactionsOrPollVotesAsSeenInteractively(postbox: Postbox, mes
 }
 
 func markMessageContentAsConsumedRemotely(transaction: Transaction, messageId: MessageId, consumeDate: Int32?) {
-    return
+    return;
 
     if let message = transaction.getMessage(messageId) {
         var updateMessage = false

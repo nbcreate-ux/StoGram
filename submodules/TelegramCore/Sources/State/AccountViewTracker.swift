@@ -943,7 +943,7 @@ public final class AccountViewTracker {
     }
     
     public func updateSeenLiveLocationForMessageIds(messageIds: Set<MessageId>) {
-        return
+        return;
 
         self.queue.async {
             var addedMessageIds: [MessageId] = []

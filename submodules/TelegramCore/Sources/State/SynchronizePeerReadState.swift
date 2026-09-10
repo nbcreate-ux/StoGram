@@ -276,20 +276,6 @@ private func pushPeerReadState(network: Network, postbox: Postbox, stateManager:
                 switch readState {
                 case let .idBased(maxIncomingReadId, _, _, _, markedUnread):
                     var pushSignal: Signal<Void, NoError> = .complete()
-                    |> map(Optional.init)
-                    |> `catch` { _ -> Signal<Api.messages.AffectedMessages?, NoError> in
-                        return .single(nil)
-                    }
-                    |> mapToSignal { result -> Signal<Void, NoError> in
-                        if let result = result {
-                            switch result {
-                                case let .affectedMessages(affectedMessagesData):
-                                    let (pts, ptsCount) = (affectedMessagesData.pts, affectedMessagesData.ptsCount)
-                                    stateManager.addUpdateGroups([.updatePts(pts: pts, ptsCount: ptsCount)])
-                            }
-                        }
-                        return .complete()
-                    }
 
                     if markedUnread {
                         pushSignal = pushSignal

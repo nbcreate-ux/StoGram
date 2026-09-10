@@ -3951,7 +3951,7 @@ func replayFinalState(
     var delayNotificatonsUntil: Int32?
     var peerActivityTimestamps: [PeerId: Int32] = [:]
     var syncChatListFilters = false
-    var deletedMessageIds: [DeletedMessageId] = []
+    let deletedMessageIds: [DeletedMessageId] = []
     var syncAttachMenuBots = false
     var updateConfig = false
     var updatedStarsBalance: [PeerId: StarsAmount] = [:]
