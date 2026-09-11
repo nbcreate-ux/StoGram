@@ -6,6 +6,9 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: macos-26
@@ -151,37 +154,24 @@ jobs:
           STOGRAM_API_ID: ${{ secrets.STOGRAM_API_ID }}
           STOGRAM_API_HASH: ${{ secrets.STOGRAM_API_HASH }}
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: build-${{ env.BUILD_NUMBER }}
-          release_name: StoGram ${{ env.APP_VERSION }} (${{ env.BUILD_NUMBER }})
-          body: |
-            An unsigned StoGram build for iOS ${{ env.APP_VERSION }} (${{ env.BUILD_NUMBER }})
-          draft: false
-          prerelease: false
+          name: StoGram-build-${{ github.run_number }}
+          path: |
+            /Users/Shared/telegram-ios/build/artifacts/StoGram.ipa
+            /Users/Shared/telegram-ios/build/artifacts/Telegram.DSYMs.zip
+          if-no-files-found: error
+          retention-days: 14
 
-      - name: Upload Release IPA
-        id: upload-release-ipa 
-        uses: actions/upload-release-asset@v1
+      - name: Create GitHub Release
+        run: |
+          gh release create "build-${BUILD_NUMBER}" \
+            "/Users/Shared/telegram-ios/build/artifacts/StoGram.ipa" \
+            "/Users/Shared/telegram-ios/build/artifacts/Telegram.DSYMs.zip" \
+            --target "$GITHUB_SHA" \
+            --title "StoGram ${APP_VERSION} (${BUILD_NUMBER})" \
+            --notes "Unsigned StoGram build for iOS ${APP_VERSION} (${BUILD_NUMBER})."
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /Users/Shared/telegram-ios/build/artifacts/StoGram.ipa
-          asset_name: StoGram.ipa
-          asset_content_type: application/zip
-
-      - name: Upload Release DSYM
-        id: upload-release-dsym 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /Users/Shared/telegram-ios/build/artifacts/Telegram.DSYMs.zip
-          asset_name: Telegram.DSYMs.zip
-          asset_content_type: application/zip
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

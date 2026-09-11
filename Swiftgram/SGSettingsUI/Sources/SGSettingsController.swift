@@ -58,6 +58,7 @@ private enum SGBoolSetting: String {
     case showProfileId
     case warnOnStoriesOpen
     case sendWithReturnKey
+    case localPremiumEnabled
     case rememberLastFolder
     case sendLargePhotos
     case storyStealthMode
@@ -323,6 +324,7 @@ private func SGControllerEntries(presentationData: PresentationData, callListSet
     entries.append(.oneFromManySelector(id: id.count, section: .other, settingName: .downloadSpeedBoost, text: i18n("Settings.DownloadsBoost", lang), value: i18n("Settings.DownloadsBoost.\(SGSimpleSettings.shared.downloadSpeedBoost)", lang), enabled: true))
     entries.append(.notice(id: id.count, section: .other, text: i18n("Settings.DownloadsBoost.Notice", lang)))
     entries.append(.toggle(id: id.count, section: .other, settingName: .sendWithReturnKey, value: SGSimpleSettings.shared.sendWithReturnKey, text: i18n("Settings.SendWithReturnKey", lang), enabled: true))
+    entries.append(.toggle(id: id.count, section: .other, settingName: .localPremiumEnabled, value: SGSimpleSettings.shared.localPremiumEnabled, text: "StoGram Premium (local)", enabled: true))
     entries.append(.toggle(id: id.count, section: .other, settingName: .forceEmojiTab, value: SGSimpleSettings.shared.forceEmojiTab, text: i18n("Settings.ForceEmojiTab", lang), enabled: true))
     entries.append(.toggle(id: id.count, section: .other, settingName: .defaultEmojisFirst, value: SGSimpleSettings.shared.defaultEmojisFirst, text: i18n("Settings.DefaultEmojisFirst", lang), enabled: true))
     entries.append(.notice(id: id.count, section: .other, text: i18n("Settings.DefaultEmojisFirst.Notice", lang)))
@@ -406,6 +408,9 @@ public func sgSettingsController(context: AccountContext/*, focusOnItemTag: Int?
             SGSimpleSettings.shared.warnOnStoriesOpen = value
         case .sendWithReturnKey:
             SGSimpleSettings.shared.sendWithReturnKey = value
+        case .localPremiumEnabled:
+            SGSimpleSettings.shared.localPremiumEnabled = value
+            askForRestart?()
         case .rememberLastFolder:
             SGSimpleSettings.shared.rememberLastFolder = value
         case .sendLargePhotos:
