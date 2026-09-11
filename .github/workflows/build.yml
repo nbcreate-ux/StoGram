@@ -136,15 +136,15 @@ jobs:
           OUTPUT_PATH="build/artifacts"
           rm -rf "$OUTPUT_PATH"
           mkdir -p "$OUTPUT_PATH"
-          for f in bazel-out/applebin_ios-ios_arm*-opt-ST-*/bin/Telegram/Telegram.ipa; do
-            cp "$f" "$OUTPUT_PATH/StoGram.ipa"
-          done
+          IPA_PATH="bazel-bin/Telegram/Swiftgram.ipa"
+          test -f "$IPA_PATH"
+          cp "$IPA_PATH" "$OUTPUT_PATH/StoGram.ipa"
 
           # collect dsym
           mkdir -p build/DSYMs
-          for f in bazel-out/applebin_ios-ios_arm*-opt-ST-*/bin/Telegram/*.dSYM; do
-            cp -R "$f" build/DSYMs/
-          done
+          DSYM_PATH="bazel-bin/Telegram/Swiftgram.app.dSYM"
+          test -d "$DSYM_PATH"
+          cp -R "$DSYM_PATH" build/DSYMs/
           zip -r "./$OUTPUT_PATH/Telegram.DSYMs.zip" build/DSYMs 1>/dev/null
 
         env:
