@@ -62,8 +62,13 @@ jobs:
 
           python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs
 
+          CERTIFICATE_DATA="$(openssl pkcs12 -legacy -in build-system/fake-codesigning/certs/SelfSigned.p12 -clcerts -nokeys -passin pass: | openssl x509 -outform DER | base64)"
+          test -n "$CERTIFICATE_DATA"
+          export CERTIFICATE_DATA
           python3 - build-system/fake-codesigning/profiles/Telegram.mobileprovision <<'PY'
+          import base64
           import plistlib
+          import os
           import sys
           import uuid
           from datetime import datetime
@@ -82,6 +87,9 @@ jobs:
               "TimeToLive": 26500,
               "UUID": str(uuid.uuid4()).upper(),
               "Version": 1,
+              "DeveloperCertificates": [
+                  base64.b64decode(os.environ["CERTIFICATE_DATA"])
+              ],
               "ExpirationDate": datetime(2099, 1, 1),
               "Entitlements": {
                   "application-identifier": "C67CF9S4VU.ua.nbcreate.stogram",
