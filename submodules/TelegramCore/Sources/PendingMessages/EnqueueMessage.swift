@@ -634,6 +634,7 @@ public func enqueueMessages(account: Account, peerId: PeerId, messages: [Enqueue
             return (resultIds, ephemeralMessageIds)
         }
         |> map { resultIds, ephemeralMessageIds -> [MessageId?] in
+            var resultIds = resultIds
             for messageId in ephemeralMessageIds {
                 let _ = _internal_sendEphemeralOutgoingMessage(account: account, messageId: messageId).startStandalone()
             }
