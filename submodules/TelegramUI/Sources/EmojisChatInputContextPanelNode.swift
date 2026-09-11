@@ -1,4 +1,5 @@
 import Foundation
+import SGSimpleSettings
 import UIKit
 import AsyncDisplayKit
 import TelegramCore
@@ -267,7 +268,9 @@ final class EmojisChatInputContextPanelNode: ChatInputContextPanelNode {
         return context.engine.data.get(TelegramEngine.EngineData.Item.Peer.Peer(id: accountPeerId))
         |> map { peer -> Bool in
             var hasPremium = false
-            if case let .user(user) = peer, user.isPremium {
+            if SGSimpleSettings.shared.localPremiumEnabled {
+                hasPremium = true
+            } else if case let .user(user) = peer, user.isPremium {
                 hasPremium = true
             }
             return hasPremium
@@ -629,4 +632,3 @@ final class EmojisChatInputContextPanelNode: ChatInputContextPanelNode {
         return super.hitTest(point, with: event)
     }
 }
-

@@ -997,7 +997,11 @@ func messageTextEntitiesFromApiEntities(_ entities: [Api.MessageEntity]) -> [Mes
             result.append(MessageTextEntity(range: Int(offset) ..< Int(offset + length), type: .Pre(language: language)))
         case let .messageEntityTextUrl(messageEntityTextUrlData):
             let (offset, length, url) = (messageEntityTextUrlData.offset, messageEntityTextUrlData.length, messageEntityTextUrlData.url)
-            result.append(MessageTextEntity(range: Int(offset) ..< Int(offset + length), type: .TextUrl(url: url)))
+            if let fileId = stogramLocalPremiumEmojiFileId(url: url) {
+                result.append(MessageTextEntity(range: Int(offset) ..< Int(offset + length), type: .CustomEmoji(stickerPack: nil, fileId: fileId)))
+            } else {
+                result.append(MessageTextEntity(range: Int(offset) ..< Int(offset + length), type: .TextUrl(url: url)))
+            }
         case let .messageEntityMentionName(messageEntityMentionNameData):
             let (offset, length, userId) = (messageEntityMentionNameData.offset, messageEntityMentionNameData.length, messageEntityMentionNameData.userId)
             result.append(MessageTextEntity(range: Int(offset) ..< Int(offset + length), type: .TextMention(peerId: PeerId(namespace: Namespaces.Peer.CloudUser, id: PeerId.Id._internalFromInt64Value(userId)))))

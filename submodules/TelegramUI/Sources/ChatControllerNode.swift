@@ -4969,7 +4969,7 @@ class ChatControllerNode: ASDisplayNode, ASScrollViewDelegate {
                             }
                         }
                         
-                        if file.isPremiumEmoji && !self.chatPresentationInterfaceState.isPremium && self.chatPresentationInterfaceState.chatLocation.peerId != self.context.account.peerId && !isPeerSpecific {
+                        if file.isPremiumEmoji && !self.chatPresentationInterfaceState.isPremium && !SGSimpleSettings.shared.localPremiumEnabled && self.chatPresentationInterfaceState.chatLocation.peerId != self.context.account.peerId && !isPeerSpecific {
                             if firstLockedPremiumEmoji == nil {
                                 firstLockedPremiumEmoji = file
                             }
@@ -5123,8 +5123,17 @@ class ChatControllerNode: ASDisplayNode, ASScrollViewDelegate {
                             } else {
                                 entities = generateTextEntities(text.string, enabledTypes: .all, currentEntities: generateChatInputTextEntities(text, maxAnimatedEmojisInText: 0))
                             }
-                            if !entities.isEmpty {
-                                attributes.append(TextEntitiesMessageAttribute(entities: entities))
+                            let outgoingEntities = entities.map { entity -> MessageTextEntity in
+                                guard SGSimpleSettings.shared.localPremiumEnabled,
+                                      case let .CustomEmoji(_, fileId) = entity.type,
+                                      let file = inlineStickers[MediaId(namespace: Namespaces.Media.CloudFile, id: fileId)] as? TelegramMediaFile,
+                                      file.isPremiumEmoji else {
+                                    return entity
+                                }
+                                return MessageTextEntity(range: entity.range, type: .TextUrl(url: stogramLocalPremiumEmojiURL(fileId: fileId)))
+                            }
+                            if !outgoingEntities.isEmpty {
+                                attributes.append(TextEntitiesMessageAttribute(entities: outgoingEntities))
                             }
                             
                             if let urlPreview = self.chatPresentationInterfaceState.urlPreview {
