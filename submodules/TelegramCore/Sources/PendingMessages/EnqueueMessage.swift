@@ -570,14 +570,41 @@ private func opportunisticallyTransformOutgoingMedia(network: Network, postbox: 
 }
 
 public func enqueueMessages(account: Account, peerId: PeerId, messages: [EnqueueMessage]) -> Signal<[MessageId?], NoError> {
-    let signal: Signal<[(Bool, EnqueueMessage)], NoError>
-    if let transformOutgoingMessageMedia = account.transformOutgoingMessageMedia {
-        signal = opportunisticallyTransformOutgoingMedia(network: account.network, postbox: account.postbox, transformOutgoingMessageMedia: transformOutgoingMessageMedia, messages: messages, userInteractive: true)
-    } else {
-        signal = .single(messages.map { (false, $0) })
+    return account.postbox.transaction { transaction -> (EnqueueMessage?, StogramProfileSyncPayload?) in
+        guard !messages.isEmpty,
+              !messages.contains(where: { message in
+            if case let .message(_, attributes, _, _, _, _, _, _, _, _) = message {
+                return attributes.contains(where: { attribute in
+                    guard let entities = (attribute as? TextEntitiesMessageAttribute)?.entities else {
+                        return false
+                    }
+                    return entities.contains(where: { entity in
+                        if case let .TextUrl(url) = entity.type {
+                            return url.hasPrefix("tg://stogram/profile/")
+                        }
+                        return false
+                    })
+                })
+            }
+            return false
+        }),
+        let message = stogramProfileSyncMessage(account: account, peerId: peerId, transaction: transaction),
+        let peer = transaction.getPeer(account.peerId),
+        let payload = stogramProfileSyncPayloadForSending(peer: peer) else {
+            return (nil, nil)
+        }
+        return (message, payload)
     }
-    return signal
-    |> mapToSignal { messages -> Signal<[MessageId?], NoError> in
+    |> mapToSignal { profileSyncMessage, profileSyncPayload -> Signal<[MessageId?], NoError> in
+        let messages = profileSyncMessage.map { [$0] + messages } ?? messages
+        let signal: Signal<[(Bool, EnqueueMessage)], NoError>
+        if let transformOutgoingMessageMedia = account.transformOutgoingMessageMedia {
+            signal = opportunisticallyTransformOutgoingMedia(network: account.network, postbox: account.postbox, transformOutgoingMessageMedia: transformOutgoingMessageMedia, messages: messages, userInteractive: true)
+        } else {
+            signal = .single(messages.map { (false, $0) })
+        }
+        return signal
+        |> mapToSignal { messages -> Signal<[MessageId?], NoError> in
         return account.postbox.transaction { transaction -> ([MessageId?], [MessageId]) in
             var resultIds = Array<MessageId?>(repeating: nil, count: messages.count)
             var ephemeralMessageIds: [MessageId] = []
@@ -610,7 +637,14 @@ public func enqueueMessages(account: Account, peerId: PeerId, messages: [Enqueue
             for messageId in ephemeralMessageIds {
                 let _ = _internal_sendEphemeralOutgoingMessage(account: account, messageId: messageId).startStandalone()
             }
+            if profileSyncMessage != nil {
+                resultIds.removeFirst()
+                if let profileSyncPayload {
+                    stogramMarkProfileSyncSent(peerId: peerId, payload: profileSyncPayload)
+                }
+            }
             return resultIds
+        }
         }
     }
 }

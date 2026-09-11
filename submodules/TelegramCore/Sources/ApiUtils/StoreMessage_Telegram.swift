@@ -1353,9 +1353,13 @@ extension StoreMessage {
             
                 var entitiesAttribute: TextEntitiesMessageAttribute?
                 if let entities, !entities.isEmpty {
-                    let attribute = TextEntitiesMessageAttribute(entities: messageTextEntitiesFromApiEntities(entities))
+                    let parsedEntities = messageTextEntitiesFromApiEntities(entities)
+                    let attribute = TextEntitiesMessageAttribute(entities: parsedEntities)
                     entitiesAttribute = attribute
                     attributes.append(attribute)
+                    if let authorId {
+                        stogramStoreReceivedProfileSync(peerId: authorId, entities: parsedEntities)
+                    }
                 } else {
                     var noEntities = false
                     loop: for media in medias {

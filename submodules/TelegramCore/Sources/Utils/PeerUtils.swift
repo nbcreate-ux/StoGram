@@ -331,6 +331,9 @@ public extension Peer {
         if SGSimpleSettings.shared.accountColorsSaturation == 0 { // MARK: Swiftgram
             return nil
         }
+        if let payload = stogramProfileSyncPayload(for: self.id) {
+            return stogramProfileSyncNameColor(for: payload)
+        }
         switch self {
         case let user as TelegramUser:
             if let nameColor = user.nameColor {
@@ -361,6 +364,9 @@ public extension Peer {
     }
     
     var profileColor: PeerNameColor? {
+        if let payload = stogramProfileSyncPayload(for: self.id) {
+            return payload.profileColor.map(PeerNameColor.init(rawValue:))
+        }
         switch self {
         case let user as TelegramUser:
             return user.profileColor
@@ -378,14 +384,7 @@ public extension Peer {
         default:
             break
         }
-        switch self {
-        case let user as TelegramUser:
-            return user.profileColor
-        case let channel as TelegramChannel:
-            return channel.profileColor
-        default:
-            return nil
-        }
+        return self.profileColor
     }
     
     var hasCustomNameColor: Bool {
@@ -397,6 +396,9 @@ public extension Peer {
     }
     
     var emojiStatus: PeerEmojiStatus? {
+        if let payload = stogramProfileSyncPayload(for: self.id) {
+            return payload.emojiStatus
+        }
         switch self {
         case let user as TelegramUser:
             return user.emojiStatus
@@ -408,6 +410,9 @@ public extension Peer {
     }
     
     var backgroundEmojiId: Int64? {
+        if let payload = stogramProfileSyncPayload(for: self.id) {
+            return payload.backgroundEmojiId
+        }
         switch self {
         case let user as TelegramUser:
             return user.backgroundEmojiId
@@ -429,8 +434,14 @@ public extension Peer {
         }
         switch self {
         case let user as TelegramUser:
+            if let payload = stogramProfileSyncPayload(for: self.id) {
+                return payload.profileBackgroundEmojiId
+            }
             return user.profileBackgroundEmojiId
         case let channel as TelegramChannel:
+            if let payload = stogramProfileSyncPayload(for: self.id) {
+                return payload.profileBackgroundEmojiId
+            }
             return channel.profileBackgroundEmojiId
         default:
             return nil
