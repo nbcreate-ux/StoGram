@@ -915,6 +915,8 @@ private func validateBatch(postbox: Postbox, network: Network, transaction: Tran
                                     
                                     if previous[id] == nil {
                                         print("\(id) missing")
+                                    } else if SGSimpleSettings.shared.stogramMessageHistoryEnabled && previousMessage.text != message.text {
+                                        stogramRecordMessageEdit(previousMessage)
                                     }
                                 } else {
                                     let _ = transaction.addMessages([message], location: .Random)
@@ -985,6 +987,12 @@ private func validateBatch(postbox: Postbox, network: Network, transaction: Tran
                                         return .update(StoreMessage(id: currentMessage.id, customStableId: nil, globallyUniqueId: currentMessage.globallyUniqueId, groupingKey: currentMessage.groupingKey, threadId: currentMessage.threadId, timestamp: currentMessage.timestamp, flags: StoreMessageFlags(currentMessage.flags), tags: updatedTags, globalTags: currentMessage.globalTags, localTags: currentMessage.localTags, forwardInfo: storeForwardInfo, authorId: currentMessage.author?.id, text: currentMessage.text, attributes: attributes, media: currentMessage.media))
                                     })
                                 } else if SGSimpleSettings.shared.preserveDeletedMessages {
+                                    transaction.updateMessage(id, update: { currentMessage in
+                                        if currentMessage.text.hasPrefix("🗑️") {
+                                            return .skip
+                                        }
+                                        return .update(StoreMessage(id: currentMessage.id, customStableId: nil, globallyUniqueId: currentMessage.globallyUniqueId, groupingKey: currentMessage.groupingKey, threadId: currentMessage.threadId, timestamp: currentMessage.timestamp, flags: StoreMessageFlags(currentMessage.flags), tags: currentMessage.tags, globalTags: currentMessage.globalTags, localTags: currentMessage.localTags, forwardInfo: currentMessage.forwardInfo.flatMap { StoreMessageForwardInfo(authorId: $0.author?.id, sourceId: $0.source?.id, sourceMessageId: $0.sourceMessageId, date: $0.date, authorSignature: $0.authorSignature, psaType: $0.psaType, flags: $0.flags) }, authorId: currentMessage.author?.id, text: "🗑️ " + currentMessage.text, attributes: currentMessage.attributes, media: currentMessage.media))
+                                    })
                                     Logger.shared.log("HistoryValidation", "preserving removed message \(id) locally")
                                 } else {
                                     _internal_deleteMessages(transaction: transaction, mediaBox: postbox.mediaBox, ids: [id])

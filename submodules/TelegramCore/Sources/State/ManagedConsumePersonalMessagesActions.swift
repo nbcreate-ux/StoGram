@@ -4,6 +4,7 @@ import SwiftSignalKit
 import TelegramApi
 import MtProtoKit
 import CryptoUtils
+import SGSimpleSettings
 
 private struct Md5Hash: Hashable {
     public let data: Data
@@ -252,7 +253,7 @@ func managedReadReactionOrPollVoteActions(postbox: Postbox, network: Network, st
 }
 
 private func synchronizeConsumeMessageContents(transaction: Transaction, postbox: Postbox, network: Network, stateManager: AccountStateManager, id: MessageId) -> Signal<Void, NoError> {
-    if ProcessInfo.processInfo.environment["STOGRAM_ENABLE_REPORTS"] == nil {
+    if SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramDisableReports {
         return .complete()
     }
 
@@ -325,7 +326,7 @@ private func synchronizeConsumeMessageContents(transaction: Transaction, postbox
 }
 
 private func synchronizeReadMessageReactionsOrPollVotes(transaction: Transaction, postbox: Postbox, network: Network, stateManager: AccountStateManager, id: MessageId) -> Signal<Void, NoError> {
-    if ProcessInfo.processInfo.environment["STOGRAM_ENABLE_REPORTS"] == nil {
+    if SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramDisableReports {
         return .complete()
     }
 

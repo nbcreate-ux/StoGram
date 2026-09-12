@@ -3,6 +3,7 @@ import Postbox
 import SwiftSignalKit
 import TelegramApi
 import MtProtoKit
+import SGSimpleSettings
 
 
 public struct PeerActivitySpace: Hashable {
@@ -142,7 +143,7 @@ private func actionFromActivity(_ activity: PeerInputActivity?) -> Api.SendMessa
 }
 
 private func requestActivity(postbox: Postbox, network: Network, accountPeerId: PeerId, peerId: PeerId, threadId: Int64?, activity: PeerInputActivity?) -> Signal<Void, NoError> {
-    if ProcessInfo.processInfo.environment["STOGRAM_ENABLE_REPORTS"] == nil {
+    if SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramDisableReports {
         return .complete()
     }
 

@@ -2,9 +2,10 @@ import Foundation
 import Postbox
 import TelegramApi
 import SwiftSignalKit
+import SGSimpleSettings
 
 func _internal_markMessageContentAsConsumedInteractively(postbox: Postbox, messageId: MessageId) -> Signal<Void, NoError> {
-    if ProcessInfo.processInfo.environment["STOGRAM_ENABLE_REPORTS"] == nil {
+    if SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramDisableReports {
         return .complete()
     }
 
@@ -178,7 +179,7 @@ func _internal_markReactionsOrPollVotesAsSeenInteractively(postbox: Postbox, mes
 }
 
 func markMessageContentAsConsumedRemotely(transaction: Transaction, messageId: MessageId, consumeDate: Int32?) {
-    if ProcessInfo.processInfo.environment["STOGRAM_ENABLE_REPORTS"] == nil {
+    if SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramDisableReports {
         return
     }
 

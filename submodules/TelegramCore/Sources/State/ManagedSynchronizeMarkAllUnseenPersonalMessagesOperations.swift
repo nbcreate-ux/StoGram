@@ -3,6 +3,7 @@ import TelegramApi
 import Postbox
 import SwiftSignalKit
 import MtProtoKit
+import SGSimpleSettings
 
 private final class ManagedSynchronizeMarkAllUnseenPersonalMessagesOperationsHelper {
     var operationDisposables: [Int32: Disposable] = [:]
@@ -117,7 +118,7 @@ private enum GetUnseenIdsError {
 }
 
 private func synchronizeMarkAllUnseen(transaction: Transaction, postbox: Postbox, network: Network, stateManager: AccountStateManager, peerId: PeerId, operation: SynchronizeMarkAllUnseenPersonalMessagesOperation) -> Signal<Void, NoError> {
-    if ProcessInfo.processInfo.environment["STOGRAM_ENABLE_REPORTS"] == nil {
+    if SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramDisableReports {
         return .complete()
     }
 
@@ -288,7 +289,7 @@ func managedSynchronizeMarkAllUnseenReactionsOperations(postbox: Postbox, networ
 }
 
 private func synchronizeMarkAllUnseenReactions(transaction: Transaction, postbox: Postbox, network: Network, stateManager: AccountStateManager, peerId: PeerId, operation: SynchronizeMarkAllUnseenReactionsOperation) -> Signal<Void, NoError> {
-    if ProcessInfo.processInfo.environment["STOGRAM_ENABLE_REPORTS"] == nil {
+    if SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramDisableReports {
         return .complete()
     }
 
@@ -388,7 +389,7 @@ func managedSynchronizeMarkAllUnseenPollVotesOperations(postbox: Postbox, networ
 }
 
 private func synchronizeMarkAllUnseenPollVotes(transaction: Transaction, postbox: Postbox, network: Network, stateManager: AccountStateManager, peerId: PeerId, operation: SynchronizeMarkAllUnseenReactionsOperation) -> Signal<Void, NoError> {
-    if ProcessInfo.processInfo.environment["STOGRAM_ENABLE_REPORTS"] == nil {
+    if SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramDisableReports {
         return .complete()
     }
 

@@ -2,11 +2,12 @@ import Foundation
 import TelegramApi
 import Postbox
 import SwiftSignalKit
+import SGSimpleSettings
 import MtProtoKit
 
 
 func _internal_markAllChatsAsRead(postbox: Postbox, network: Network, stateManager: AccountStateManager) -> Signal<Void, NoError> {
-    if ProcessInfo.processInfo.environment["STOGRAM_ENABLE_REPORTS"] == nil {
+    if SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramDisableReports {
         return .complete()
     }
 

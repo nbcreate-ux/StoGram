@@ -62,6 +62,8 @@ private enum SGBoolSetting: String {
     case preserveDeletedMessages
     case stogramProfileSyncEnabled
     case stogramPremiumEmojiEnabled
+    case stogramMessageHistoryEnabled
+    case stogramDisableReports
     case localPremiumEnabled
     case rememberLastFolder
     case sendLargePhotos
@@ -334,6 +336,8 @@ private func SGControllerEntries(presentationData: PresentationData, callListSet
     entries.append(.toggle(id: id.count, section: .other, settingName: .preserveDeletedMessages, value: SGSimpleSettings.shared.preserveDeletedMessages, text: "Keep deleted messages locally", enabled: stogramFeaturesEnabled))
     entries.append(.toggle(id: id.count, section: .other, settingName: .stogramProfileSyncEnabled, value: SGSimpleSettings.shared.stogramProfileSyncEnabled, text: "Sync StoGram profile locally", enabled: stogramFeaturesEnabled))
     entries.append(.toggle(id: id.count, section: .other, settingName: .stogramPremiumEmojiEnabled, value: SGSimpleSettings.shared.stogramPremiumEmojiEnabled, text: "StoGram Premium emoji", enabled: stogramFeaturesEnabled))
+    entries.append(.toggle(id: id.count, section: .other, settingName: .stogramMessageHistoryEnabled, value: SGSimpleSettings.shared.stogramMessageHistoryEnabled, text: "Keep message edit history", enabled: stogramFeaturesEnabled))
+    entries.append(.toggle(id: id.count, section: .other, settingName: .stogramDisableReports, value: SGSimpleSettings.shared.stogramDisableReports, text: "Disable online, read and typing reports", enabled: stogramFeaturesEnabled))
     entries.append(.toggle(id: id.count, section: .other, settingName: .forceEmojiTab, value: SGSimpleSettings.shared.forceEmojiTab, text: i18n("Settings.ForceEmojiTab", lang), enabled: true))
     entries.append(.toggle(id: id.count, section: .other, settingName: .defaultEmojisFirst, value: SGSimpleSettings.shared.defaultEmojisFirst, text: i18n("Settings.DefaultEmojisFirst", lang), enabled: true))
     entries.append(.notice(id: id.count, section: .other, text: i18n("Settings.DefaultEmojisFirst.Notice", lang)))
@@ -429,6 +433,10 @@ public func sgSettingsController(context: AccountContext/*, focusOnItemTag: Int?
             SGSimpleSettings.shared.stogramProfileSyncEnabled = value
         case .stogramPremiumEmojiEnabled:
             SGSimpleSettings.shared.stogramPremiumEmojiEnabled = value
+        case .stogramMessageHistoryEnabled:
+            SGSimpleSettings.shared.stogramMessageHistoryEnabled = value
+        case .stogramDisableReports:
+            SGSimpleSettings.shared.stogramDisableReports = value
         case .rememberLastFolder:
             SGSimpleSettings.shared.rememberLastFolder = value
         case .sendLargePhotos:

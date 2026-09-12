@@ -42,7 +42,7 @@ import ChatMessageItemView
 import ChatMessageBubbleItemNode
 import AdsInfoScreen
 import AdsReportScreen
- 
+
 private struct MessageContextMenuData {
     let starStatus: Bool?
     let canReply: Bool
@@ -721,6 +721,21 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
                     
                     f(.default)
                 })))
+            }
+
+            if SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramMessageHistoryEnabled {
+                let history = stogramMessageEditHistory(message.id)
+                if !history.isEmpty {
+                    actions.append(.action(ContextMenuActionItem(text: "Edit history", icon: { theme in
+                        return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Info"), color: theme.actionSheet.primaryTextColor)
+                    }, action: { _, f in
+                        let text = history.enumerated().map { index, entry in
+                            "\(index + 1). \(entry.text)"
+                        }.joined(separator: "\n\n")
+                        controllerInteraction.presentController(textAlertController(context: context, title: "Edit history", text: text, actions: [TextAlertAction(type: .defaultAction, title: presentationData.strings.Common_OK, action: {})]), nil)
+                        f(.default)
+                    })))
+                }
             }
         }
 

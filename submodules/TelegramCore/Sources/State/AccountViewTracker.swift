@@ -3,6 +3,7 @@ import Postbox
 import SwiftSignalKit
 import TelegramApi
 import MtProtoKit
+import SGSimpleSettings
 
 
 public enum CallListViewType {
@@ -943,7 +944,7 @@ public final class AccountViewTracker {
     }
     
     public func updateSeenLiveLocationForMessageIds(messageIds: Set<MessageId>) {
-        if ProcessInfo.processInfo.environment["STOGRAM_ENABLE_REPORTS"] == nil {
+        if SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramDisableReports {
             return
         }
 
