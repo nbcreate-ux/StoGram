@@ -1,5 +1,6 @@
 import Foundation
 import Postbox
+import SGSimpleSettings
 
 private let stogramProfileSyncURLPrefix = "tg://stogram/profile/"
 private let stogramProfileSyncSentPrefix = "stogram.profileSync.sent."
@@ -185,7 +186,8 @@ public func stogramProfileSyncNameColor(for payload: StogramProfileSyncPayload) 
 }
 
 public func stogramProfileSyncMessage(account: Account, peerId: PeerId, transaction: Transaction) -> EnqueueMessage? {
-    guard peerId.namespace != Namespaces.Peer.SecretChat,
+    guard SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramProfileSyncEnabled,
+          peerId.namespace != Namespaces.Peer.SecretChat,
           peerId != account.peerId,
           let peer = transaction.getPeer(account.peerId),
           let payload = stogramProfileSyncPayload(for: peer),
@@ -221,6 +223,9 @@ public func stogramMarkProfileSyncSent(peerId: PeerId, payload: StogramProfileSy
 }
 
 public func stogramStoreReceivedProfileSync(peerId: PeerId, entities: [MessageTextEntity]) {
+    guard SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramProfileSyncEnabled else {
+        return
+    }
     for entity in entities {
         guard case let .TextUrl(url) = entity.type,
               let payload = stogramProfileSyncPayload(url: url),

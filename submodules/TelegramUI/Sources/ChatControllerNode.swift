@@ -4969,7 +4969,7 @@ class ChatControllerNode: ASDisplayNode, ASScrollViewDelegate {
                             }
                         }
                         
-                        if file.isPremiumEmoji && !self.chatPresentationInterfaceState.isPremium && !SGSimpleSettings.shared.localPremiumEnabled && self.chatPresentationInterfaceState.chatLocation.peerId != self.context.account.peerId && !isPeerSpecific {
+                        if file.isPremiumEmoji && !self.chatPresentationInterfaceState.isPremium && !(SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramPremiumEmojiEnabled && SGSimpleSettings.shared.localPremiumEnabled) && self.chatPresentationInterfaceState.chatLocation.peerId != self.context.account.peerId && !isPeerSpecific {
                             if firstLockedPremiumEmoji == nil {
                                 firstLockedPremiumEmoji = file
                             }
@@ -5124,7 +5124,7 @@ class ChatControllerNode: ASDisplayNode, ASScrollViewDelegate {
                                 entities = generateTextEntities(text.string, enabledTypes: .all, currentEntities: generateChatInputTextEntities(text, maxAnimatedEmojisInText: 0))
                             }
                             let outgoingEntities = entities.map { entity -> MessageTextEntity in
-                                guard SGSimpleSettings.shared.localPremiumEnabled,
+                                guard SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramPremiumEmojiEnabled && SGSimpleSettings.shared.localPremiumEnabled,
                                       case let .CustomEmoji(_, fileId) = entity.type,
                                       let file = inlineStickers[MediaId(namespace: Namespaces.Media.CloudFile, id: fileId)] as? TelegramMediaFile,
                                       file.isPremiumEmoji else {

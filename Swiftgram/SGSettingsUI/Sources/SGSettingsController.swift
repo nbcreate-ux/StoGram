@@ -58,6 +58,10 @@ private enum SGBoolSetting: String {
     case showProfileId
     case warnOnStoriesOpen
     case sendWithReturnKey
+    case stogramModeEnabled
+    case preserveDeletedMessages
+    case stogramProfileSyncEnabled
+    case stogramPremiumEmojiEnabled
     case localPremiumEnabled
     case rememberLastFolder
     case sendLargePhotos
@@ -324,7 +328,12 @@ private func SGControllerEntries(presentationData: PresentationData, callListSet
     entries.append(.oneFromManySelector(id: id.count, section: .other, settingName: .downloadSpeedBoost, text: i18n("Settings.DownloadsBoost", lang), value: i18n("Settings.DownloadsBoost.\(SGSimpleSettings.shared.downloadSpeedBoost)", lang), enabled: true))
     entries.append(.notice(id: id.count, section: .other, text: i18n("Settings.DownloadsBoost.Notice", lang)))
     entries.append(.toggle(id: id.count, section: .other, settingName: .sendWithReturnKey, value: SGSimpleSettings.shared.sendWithReturnKey, text: i18n("Settings.SendWithReturnKey", lang), enabled: true))
-    entries.append(.toggle(id: id.count, section: .other, settingName: .localPremiumEnabled, value: SGSimpleSettings.shared.localPremiumEnabled, text: "StoGram Premium (local)", enabled: true))
+    let stogramFeaturesEnabled = SGSimpleSettings.shared.stogramModeEnabled
+    entries.append(.toggle(id: id.count, section: .other, settingName: .localPremiumEnabled, value: SGSimpleSettings.shared.localPremiumEnabled, text: "StoGram Premium (local)", enabled: stogramFeaturesEnabled))
+    entries.append(.toggle(id: id.count, section: .other, settingName: .stogramModeEnabled, value: SGSimpleSettings.shared.stogramModeEnabled, text: "StoGram mode", enabled: true))
+    entries.append(.toggle(id: id.count, section: .other, settingName: .preserveDeletedMessages, value: SGSimpleSettings.shared.preserveDeletedMessages, text: "Keep deleted messages locally", enabled: stogramFeaturesEnabled))
+    entries.append(.toggle(id: id.count, section: .other, settingName: .stogramProfileSyncEnabled, value: SGSimpleSettings.shared.stogramProfileSyncEnabled, text: "Sync StoGram profile locally", enabled: stogramFeaturesEnabled))
+    entries.append(.toggle(id: id.count, section: .other, settingName: .stogramPremiumEmojiEnabled, value: SGSimpleSettings.shared.stogramPremiumEmojiEnabled, text: "StoGram Premium emoji", enabled: stogramFeaturesEnabled))
     entries.append(.toggle(id: id.count, section: .other, settingName: .forceEmojiTab, value: SGSimpleSettings.shared.forceEmojiTab, text: i18n("Settings.ForceEmojiTab", lang), enabled: true))
     entries.append(.toggle(id: id.count, section: .other, settingName: .defaultEmojisFirst, value: SGSimpleSettings.shared.defaultEmojisFirst, text: i18n("Settings.DefaultEmojisFirst", lang), enabled: true))
     entries.append(.notice(id: id.count, section: .other, text: i18n("Settings.DefaultEmojisFirst.Notice", lang)))
@@ -411,6 +420,15 @@ public func sgSettingsController(context: AccountContext/*, focusOnItemTag: Int?
         case .localPremiumEnabled:
             SGSimpleSettings.shared.localPremiumEnabled = value
             askForRestart?()
+        case .stogramModeEnabled:
+            SGSimpleSettings.shared.stogramModeEnabled = value
+            askForRestart?()
+        case .preserveDeletedMessages:
+            SGSimpleSettings.shared.preserveDeletedMessages = value
+        case .stogramProfileSyncEnabled:
+            SGSimpleSettings.shared.stogramProfileSyncEnabled = value
+        case .stogramPremiumEmojiEnabled:
+            SGSimpleSettings.shared.stogramPremiumEmojiEnabled = value
         case .rememberLastFolder:
             SGSimpleSettings.shared.rememberLastFolder = value
         case .sendLargePhotos:

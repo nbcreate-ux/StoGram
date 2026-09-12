@@ -2580,7 +2580,7 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
                         }
                         
                         let entityType: MessageTextEntityType
-                        if SGSimpleSettings.shared.localPremiumEnabled && file.isPremiumEmoji {
+                        if SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramPremiumEmojiEnabled && SGSimpleSettings.shared.localPremiumEnabled && file.isPremiumEmoji {
                             entityType = .TextUrl(url: stogramLocalPremiumEmojiURL(fileId: file.fileId.id))
                         } else {
                             entityType = .CustomEmoji(stickerPack: nil, fileId: file.fileId.id)

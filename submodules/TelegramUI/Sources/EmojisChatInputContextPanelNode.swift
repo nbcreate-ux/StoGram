@@ -268,7 +268,7 @@ final class EmojisChatInputContextPanelNode: ChatInputContextPanelNode {
         return context.engine.data.get(TelegramEngine.EngineData.Item.Peer.Peer(id: accountPeerId))
         |> map { peer -> Bool in
             var hasPremium = false
-            if SGSimpleSettings.shared.localPremiumEnabled {
+            if SGSimpleSettings.shared.stogramModeEnabled && SGSimpleSettings.shared.stogramPremiumEmojiEnabled && SGSimpleSettings.shared.localPremiumEnabled {
                 hasPremium = true
             } else if case let .user(user) = peer, user.isPremium {
                 hasPremium = true

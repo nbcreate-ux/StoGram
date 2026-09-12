@@ -176,6 +176,10 @@ public class SGSimpleSettings {
         case warnOnStoriesOpen
         case showProfileId
         case sendWithReturnKey
+        case stogramModeEnabled
+        case preserveDeletedMessages
+        case stogramProfileSyncEnabled
+        case stogramPremiumEmojiEnabled
         case localPremiumEnabled
     }
     
@@ -330,6 +334,10 @@ public class SGSimpleSettings {
         Keys.warnOnStoriesOpen.rawValue: false,
         Keys.showProfileId.rawValue: true,
         Keys.sendWithReturnKey.rawValue: false,
+        Keys.stogramModeEnabled.rawValue: true,
+        Keys.preserveDeletedMessages.rawValue: true,
+        Keys.stogramProfileSyncEnabled.rawValue: true,
+        Keys.stogramPremiumEmojiEnabled.rawValue: true,
         Keys.localPremiumEnabled.rawValue: true
     ]
     
@@ -486,6 +494,18 @@ public class SGSimpleSettings {
 
     @UserDefault(key: Keys.localPremiumEnabled.rawValue)
     public var localPremiumEnabled: Bool
+
+    @UserDefault(key: Keys.stogramModeEnabled.rawValue)
+    public var stogramModeEnabled: Bool
+
+    @UserDefault(key: Keys.preserveDeletedMessages.rawValue)
+    public var preserveDeletedMessages: Bool
+
+    @UserDefault(key: Keys.stogramProfileSyncEnabled.rawValue)
+    public var stogramProfileSyncEnabled: Bool
+
+    @UserDefault(key: Keys.stogramPremiumEmojiEnabled.rawValue)
+    public var stogramPremiumEmojiEnabled: Bool
     
     @UserDefault(key: Keys.showDC.rawValue)
     public var showDC: Bool
